@@ -11,7 +11,7 @@ public enum StepLayoutType {
     case identification,photo,exptectedVariety, analysis, note
 }
 
-struct ScenarioPlayerView: View {
+public struct ScenarioPlayerView: View {
     
     @State private var isUploadImageViewShown: Bool = false
     public var scenarioId: Int
@@ -20,11 +20,11 @@ struct ScenarioPlayerView: View {
     @State private var indentificationisCompleted = false
     
     public init(player: ScenarioPlayerComponent, scenarioId: Int) {
-        self.player = player
-        self.scenarioId = scenarioId
-    }
+          self.player = player
+          self.scenarioId = scenarioId
+      }
     
-    var body: some View {
+    public var body: some View {
         NavigationView {
             ZStack {
                 if false {
@@ -126,11 +126,11 @@ struct ScenarioPlayerView: View {
     
 }
 
-public struct ScenarioPlayerView_Previews: PreviewProvider {
-    public static var previews: some View {
-        ScenarioPlayerView(player: ScenarioPlayerComponent(), scenarioId: 0)
-    }
-}
+//public struct ScenarioPlayerView_Previews: PreviewProvider {
+//    public static var previews: some View {
+//        ScenarioPlayerView(player: ScenarioPlayerComponent(), scenarioId: 0)
+//    }
+//}
 
 public struct PackageImageTextView: View {
     public var title: String
