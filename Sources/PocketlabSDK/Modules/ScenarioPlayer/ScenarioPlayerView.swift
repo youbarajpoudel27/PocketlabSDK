@@ -2,32 +2,29 @@
 //  SwiftUIView.swift
 //  
 //
-//  Created by Youbaraj POUDEL on 08/11/2023.
+//  Created by Youbaraj POUDEL on 06/12/2023.
 //
 
 import SwiftUI
 
-public enum ScenarioInstanceStepsType {
+public enum StepLayoutType {
     case identification,photo,exptectedVariety, analysis, note
 }
 
-
-public struct ScenarioPlayerComponent: View {
+struct ScenarioPlayerView: View {
     
-    public var annotationType: AnnotationType
+    @State private var isUploadImageViewShown: Bool = false
     public var scenarioId: Int
+    public var player: ScenarioPlayerComponent
+    @State private var indentificationCompleted = false
+    @State private var indentificationisCompleted = false
     
-    public init(){
-        self.annotationType = AnnotationType.remoteId
-        self.scenarioId = 1288
-    }
-    
-    public init(annotationType: AnnotationType, scenarioId: Int) {
-        self.annotationType = annotationType
+    public init(player: ScenarioPlayerComponent, scenarioId: Int) {
+        self.player = player
         self.scenarioId = scenarioId
     }
     
-    public var body: some View {
+    var body: some View {
         NavigationView {
             ZStack {
                 if false {
@@ -35,7 +32,7 @@ public struct ScenarioPlayerComponent: View {
                         .navigationBarBackButtonHidden(true)
                         .onAppear {
                         }
-                }else {
+                } else {
                     VStack {
                         ScrollView {
                             VStack(alignment: .leading, spacing: 16) {
@@ -51,33 +48,55 @@ public struct ScenarioPlayerComponent: View {
                                             } label: {
                                                 
                                             }
+                                            
                                         }
                                         .padding(.horizontal, 32)
                                     }
-                                }//end of vstack
+                                }
                                 VStack(spacing: 0) {
                                     VStack(alignment: .center) {
                                         Spacer().frame(height: 12)
                                         PackageCustomText(name: "Created on 28/02/23 at 09:53", textColor: PackageColors.pureBlack.opacity(0.4) ,alignment: .center, font: PackageFonts.regularFont12)
                                         Spacer().frame(height: 12)
-                                    }.frame(maxWidth: .infinity) //end of vstack
-                                    
+                                    }.frame(maxWidth: .infinity)
                                     VStack {
-                                        PackageImageTextView(title: "Identification", annotationType: AnnotationType.remoteId, scenarioInstanceStepsType:ScenarioInstanceStepsType.identification)
+//                                        NavigationLink(destination: BannerScannerView(clicked: { code in
+//                                            //
+//                                            self.updateData(sampleId: code)
+//
+//                                        }), isActive: $indentificationCompleted) {
+//                                            PackageImageTextView(title: "Identification", annotationType: player.annotationType, varietyAnalysisCellType: .identification, isCompleted: $indentificationisCompleted)
+//                                        }
                                         
-                                       //add navigation link for image later.
                                         
-                                        //variety declaration
                                         NavigationLink {
                                             VarietyDeclarationView()
                                         } label: {
-                                            PackageImageTextView(title: "Expected variety", secondaryTitle: "Apprilio", annotationType: AnnotationType.variety, scenarioInstanceStepsType: ScenarioInstanceStepsType.exptectedVariety)
+                                            PackageImageTextView(title: "Expected variety", secondaryTitle: "Apprilio", annotationType: player.annotationType, stepLayoutType: .exptectedVariety, isCompleted: .constant(false))
                                         }
                                         
-                                        //add other steps later based on the scenario system config.
-                                        
-                                        
-                                    }//end of vstack
+                                        VStack {
+                                            VStack(alignment: .leading) {
+                                                HStack(alignment: .center) {
+                                                    Image("plus", bundle: .main)
+                                                    VStack(alignment: .leading, spacing: 0) {
+                                                        Text("Analysis")
+                                                            .foregroundColor(PackageColors.pureBlack)
+                                                        PackageCustomText(name: "Please complete all steps above", textColor: PackageColors.pureBlack.opacity(0.4) , font: PackageFonts.regularFont12)
+                                                    }
+                                                    Spacer()
+                                                    
+                                                }
+                                                .frame(maxWidth: .infinity)
+                                            }
+                                            .padding(10)
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 58)
+                                            .cornerRadius(10)
+                                            
+                                        }
+                                        PackageImageTextView(title: "Notes", annotationType: player.annotationType, stepLayoutType: .note, isCompleted: .constant(false))
+                                    }
                                     .padding(.horizontal, 16)
                                 }
                                 .background(PackageColors.darkGray)
@@ -100,34 +119,40 @@ public struct ScenarioPlayerComponent: View {
             }
         }
     }
+    
+    func updateData(sampleId: String) {
+           indentificationisCompleted = true
+       }
+    
 }
 
-struct ScenarioPlayerComponent_Previews: PreviewProvider {
-    static var previews: some View {
-        ScenarioPlayerComponent(annotationType: AnnotationType.remoteId,  scenarioId: 1288)
+public struct ScenarioPlayerView_Previews: PreviewProvider {
+    public static var previews: some View {
+        ScenarioPlayerView(player: ScenarioPlayerComponent(), scenarioId: 0)
     }
 }
-
 
 public struct PackageImageTextView: View {
     public var title: String
     public var secondaryTitle: String?
-    public var annotationType: AnnotationType
-    public var scenarioInstanceStepsType: ScenarioInstanceStepsType
+    public var annotationType: AnnotationType?
+    public var stepLayoutType: StepLayoutType
+    @Binding public var isCompleted: Bool
     public var body: some View {
         VStack {
             VStack(alignment: .leading) {
                 HStack {
-                    //Image("plus", bundle: .module)
+                    Image("plus", bundle: .main)
                     Text(title)
                         .foregroundColor(PackageColors.pureBlack)
                     Spacer()
                     if let secondaryTitle = secondaryTitle {
                         Text(secondaryTitle)
                             .foregroundColor(PackageColors.pureBlack)
-                      //  Image("plus", bundle: .module)
+                        Image("plus", bundle: .main)
                     }
-                    if getHeight() == 40 {
+//                    if getHeight() == 40 {
+                    if isCompleted == true {
                         TickMarkView()
                     }
                 }
@@ -135,7 +160,7 @@ public struct PackageImageTextView: View {
             }
             .padding(10)
             .frame(maxWidth: .infinity)
-            .frame(height: getHeight())
+            .frame(height: isCompleted ? 40 : 58)
             .background(PackageColors.pureWhite)
             .cornerRadius(10)
             
@@ -147,10 +172,14 @@ public struct PackageImageTextView: View {
         switch annotationType {
         case .remoteId, .variety, .proteinRate: return 58
         case .customRemoteId(_):
-            if scenarioInstanceStepsType == .identification { return 40 }
+            if stepLayoutType == .identification { return 40 }
         case .customVariety(_):
-            if scenarioInstanceStepsType == .exptectedVariety { return 40 }
-           
+            if stepLayoutType == .exptectedVariety { return 40 }
+        case .customRemoteIdAndVariety(_, _):
+            switch stepLayoutType {
+            case .identification, .exptectedVariety: return 40
+            default: return 58
+            }
         default: return 58
         }
         return 58
@@ -167,4 +196,3 @@ public struct TickMarkView: View {
             .font(.system(size: defaultSize))
     }
 }
-
